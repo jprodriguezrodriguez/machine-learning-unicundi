@@ -58,17 +58,19 @@
     </style>
 </head>
 <body>
-    <h1>Regresion Lineal: Calculador de Calificaciones basado en las Horas de Estudio</h1>
+    <h1>Regresion Lineal: Calculador de Edad basado en la frecuencia cardiaca</h1>
 
     <form method="post">
-        <label for="Hours">Horas Estudiadas</label>
-        <input type="text" name="Hours" id="Hours" required>
+        <label for="Edad">Edad</label>
+        <input type="number" name="Hours" step="0.1" required>
+
         <button type="submit">Calcular</button>
     </form>
 
-    {% if result is not none %}
-        <h2>Estimated Result: {{ result }}</h2>
-    {% endif %}
+    {% if plot_url %}
+<img src="data:image/png;base64,{{ plot_url }}" alt="Regression Graph">
+{% endif %}
+
 
     <h2>Grafico de Regresion Lineal</h2>
     <img src="data:image/png;base64,{{ plot_url }}" alt="Regression Plot">
