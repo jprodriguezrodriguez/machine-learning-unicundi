@@ -1,11 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Casos de Éxito en Machine Learning Supervisado - Grupo 2</title>
+    <title>Casos de Éxito - ML Supervisado</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200..1000&display=swap" rel="stylesheet">
 </head>
+
 <body>
+    <header>
+        <h1>Casos de Éxito de Machine Learning Supervisado</h1>
+    </header>
     
+    <main>
+        {% for case in cases %}
+        <div class="card">
+            <h2>{{ case.title }}</h2>
+            <p class="sector"><strong>Industria/Sector:</strong> {{ case.sector }}</p>
+            <p class="problem"><strong>Problema resuelto:</strong> {{ case.problem }}</p>
+            <p class="algorithm"><strong>Algoritmo utilizado:</strong> {{ case.algorithm }}</p>
+            <p class="benefits"><strong>Beneficios obtenidos:</strong> {{ case.benefits }}</p>
+            <p class="company"><strong>Empresa o proyecto:</strong> {{ case.company }}</p>
+            <p class="reference"><strong>Referencia:</strong> <a href="{{case.referenceUrl}}" target="_blank">{{ case.reference }}</a></p>
+        </div>
+        {% endfor %}
+    </main>
+
+    <footer>
+        <p>Grupo #2 - Machine Learning | &copy; 2025</p>
+    </footer>
 </body>
+
 </html>
