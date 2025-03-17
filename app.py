@@ -2,8 +2,9 @@ import re
 from flask import Flask, render_template, request
 from datetime import datetime
 
-import linearRegressionML
-#import LinearRegressionExcelML
+import linearRegressionML as lr
+
+#import LinearRegressionExcelML|
 
 app = Flask(__name__)
 
@@ -26,24 +27,25 @@ def hello_there(name):
 def exampleHTML():
     return render_template("example.html")
 
-
 @app.route("/linearregressionpage", methods=["GET", "POST"])
 def calculateGrade():
     calculateResult = None
+    plot_url = None
     hours = None
 
     if request.method == "POST":
         try:
             hours = float(request.form["Hours"])
-            calculateResult = linearRegressionML.calculateGrade(hours)
+            calculateResult = lr.calculateGrade(hours)
+            plot_url = lr.generate_plot(hours)  # Generar gráfica solo si el input es válido
         except ValueError:
             calculateResult = "Invalid input. Please enter a number."
-
-    # Generar gráfico con el valor ingresado
-    plot_url = linearRegressionML.generate_plot(hours)
-
+            plot_url = None  # Evita mostrar una gráfica si hay error en la entrada
+    
     return render_template("linearRegressionGrades.html", result=calculateResult, plot_url=plot_url, hours=hours)
 
+if __name__ == "__main__":
+    app.run(debug=True)
 @app.route("/mindmeister")
 def MapaMental():
     return render_template("MapaMental.html")
