@@ -57,6 +57,6 @@ def calculateGrade():
 
 if __name__ == "__main__":
     app.run(debug=True)
-@app.route("/mindmeister")
+@app.route("/mapa-mental")
 def MapaMental():
     return render_template("MapaMental.html")
