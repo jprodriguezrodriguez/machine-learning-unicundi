@@ -1,38 +1,32 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Casos de Éxito - ML Supervisado</title>
+    <title>Machine Learning - Landing</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200..1000&display=swap" rel="stylesheet">
 </head>
-
 <body>
-    <header>
-        <h1>Casos de Éxito de Machine Learning Supervisado</h1>
-    </header>
-    
-    <main>
-        {% for case in cases %}
-        <div class="card">
-            <h2>{{ case.title }}</h2>
-            <p class="sector"><strong>Industria/Sector:</strong> {{ case.sector }}</p>
-            <p class="problem"><strong>Problema resuelto:</strong> {{ case.problem }}</p>
-            <p class="algorithm"><strong>Algoritmo utilizado:</strong> {{ case.algorithm }}</p>
-            <p class="benefits"><strong>Beneficios obtenidos:</strong> {{ case.benefits }}</p>
-            <p class="company"><strong>Empresa o proyecto:</strong> {{ case.company }}</p>
-            <p class="reference"><strong>Referencia:</strong> <a href="{{case.referenceUrl}}" target="_blank">{{ case.reference }}</a></p>
-        </div>
-        {% endfor %}
-    </main>
-
-    <footer>
-        <p>Grupo #2 - Machine Learning | &copy; 2025</p>
-    </footer>
+    <div class="container">
+        <nav class="sidebar">
+            <ul>
+                <li><a href="/" onclick="loadContent('home')">Inicio</a></li>
+                <li><a href="/casos-de-exito" onclick="loadContent('casos-de-exito')">Casos de Éxito</a></li>
+                <li><a href="/promedio-notas" onclick="loadContent('promedio-notas')">Promedio Notas</a></li>
+                <li><a href="/mapa-mental" onclick="loadContent('mapa-mental')">Mapa Mental</a></li>
+            </ul>
+        </nav>
+        <main class="content" id="main-content">
+            <h1>Bienvenido a la Introducción a Machine Learning</h1>
+            <p>Autores:</p>
+            <ul>
+                <li>Rubén Rodríguez</li>
+                <li>Jennifer Espitia</li>
+                <li>Johanna Garzón</li>
+                <li>Jenny Rodríguez</li>
+            </ul>
+        </main>
+    </div>
+    <script src="script.js"></script>
 </body>
-
 </html>

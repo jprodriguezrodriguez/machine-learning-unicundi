@@ -3,8 +3,11 @@ import linearRegressionML as lr
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route("/")
 def index():
+    return render_template('index.html')
+@app.route('/casos-de-exito')
+def successCases():
     casesList = [
         {
             'title': 'Diagnóstico Médico Asistido por IA',
@@ -37,8 +40,8 @@ def index():
             'referenceUrl': 'https://blog.beservices.es/blog/ejemplos-de-machine-learning-en-empresas'
         }
     ]
-    return render_template('index.html', cases=casesList)
-@app.route("/linearregressionpage", methods=["GET", "POST"])
+    return render_template('casos-de-exito.html', cases=casesList)
+@app.route("/promedio-notas", methods=["GET", "POST"])
 def calculateGrade():
     calculateResult = None
     plot_url = None
@@ -57,8 +60,8 @@ def calculateGrade():
 
 
 @app.route("/mapa-mental")
-def MapaMental():
-    return render_template("MapaMental.html")
+def mentalMind():
+    return render_template("mapa-mental.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
