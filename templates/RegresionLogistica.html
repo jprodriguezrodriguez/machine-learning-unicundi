@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regresion Logistica de Salud - 100 Pacientes</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #eaf2f8;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        .data-table-container {
+            max-height: 500px;
+            overflow-y: auto;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            position: sticky;
+            top: 0;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        tr:hover {
+            background-color: #e6f7ff;
+        }
+        .enfermo {
+            background-color: #ffebee;
+        }
+        .sano {
+            background-color: #e8f5e9;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-enfermo {
+            background-color: #ffcdd2;
+            color: #c62828;
+        }
+        .badge-sano {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+        }
+        .sintomas {
+            font-weight: 500;
+        }
+        .leves { color: #388e3c; }
+        .moderados { color: #f57c00; }
+        .graves { color: #d32f2f; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Análisis de Salud Cardiovascular</h1>
+        <p style="color: #666;">Dataset completo de 100 pacientes con análisis predictivo</p>
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total }}</div>
+                <div class="stat-label">Total Pacientes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.sanos }}</div>
+                <div class="stat-label">Pacientes Sanos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.enfermos }}</div>
+                <div class="stat-label">Pacientes Enfermos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.edad_promedio }}</div>
+                <div class="stat-label">Edad Promedio</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.presion_promedio }}</div>
+                <div class="stat-label">Presión Promedio</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.accuracy }}%</div>
+                <div class="stat-label">Precisión del Modelo</div>
+            </div>
+        </div>
+        
+        <div class="grid">
+            <div class="card">
+                <h2>Relación Edad-Presión Arterial</h2>
+                <img src="data:image/png;base64,{{ grafico_edad_presion }}" alt="Edad vs Presión">
+                <p style="text-align: center; color: #666; margin-top: 10px;">
+                    Distribución de 100 pacientes según edad y presión arterial
+                </p>
+            </div>
+            
+            <div class="card">
+                <h2>Matriz de Confusión</h2>
+                <img src="data:image/png;base64,{{ grafico_confusion }}" alt="Matriz de Confusión">
+                <p style="text-align: center; color: #666; margin-top: 10px;">
+                    Rendimiento del modelo de clasificación
+                </p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Tabla Completa de 100 Pacientes</h2>
+            
+            {% if not tabla_datos %}
+            <div style="color: red; padding: 20px; background: #ffeeee; border-radius: 8px;">
+                ¡Advertencia! No se recibieron datos para mostrar en la tabla.
+            </div>
+            {% else %}
+            <div class="data-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Edad</th>
+                            <th>Presión</th>
+                            <th>Colesterol</th>
+                            <th>Síntomas</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dato in tabla_datos %}
+                        <tr class="{{ 'enfermo' if dato['Enfermedad'] == 1 else 'sano' }}">
+                            <td>{{ dato['ID'] }}</td>
+                            <td>{{ dato['Edad'] }}</td>
+                            <td>{{ dato['Presion'] }}</td>
+                            <td>{{ dato['Colesterol'] }}</td>
+                            <td>
+                                <span class="sintomas {{ 
+                                    'leves' if dato['Sintomas'] == 'Leves' 
+                                    else 'moderados' if dato['Sintomas'] == 'Moderados' 
+                                    else 'graves' 
+                                }}">
+                                    {{ dato['Sintomas'] }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge {{ 
+                                    'badge-enfermo' if dato['Enfermedad'] == 1 
+                                    else 'badge-sano' 
+                                }}">
+                                    {{ 'Enfermo' if dato['Enfermedad'] == 1 else 'Sano' }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <p style="text-align: center; color: #666; margin-top: 10px;">
+                Mostrando {{ tabla_datos|length }} registros de 100
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
