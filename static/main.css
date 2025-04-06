@@ -80,10 +80,15 @@ header p {
     background-color: #005cbe;
     cursor: pointer;
 }
-.container__sidebar details.active,
+
 .container__sidebar ul li.active {
     background-color: #9de3ff;
     padding-left: 20px;
+    border-left: 3px solid white;
+}
+
+.container__sidebar details.active {
+    background-color: #01468f;
     border-left: 3px solid white;
 }
 
