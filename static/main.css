@@ -52,6 +52,16 @@ header p {
     width: 100%;
 }
 
+.container__sidebar .submenu {
+    padding-left: 20px;
+}
+
+.container__sidebar details summary {
+    margin-bottom: 10px;
+    padding: 10px;
+    transition: all .4s ease-in-out;
+}
+
 .container__sidebar ul li {
     padding: 10px;
 }
@@ -65,8 +75,10 @@ header p {
     transition: all .4s ease-in-out;
 }
 
+.container__sidebar details summary:hover,
 .container__sidebar ul li:hover {
     background-color: #005cbe;
+    cursor: pointer;
 }
 
 .container__sidebar ul li.active {
