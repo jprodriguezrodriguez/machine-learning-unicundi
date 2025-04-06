@@ -4,8 +4,17 @@ from DatasetCardiovascular import SaludModel
 
 app = Flask(__name__)
 modelo = SaludModel()
-@app.route('/')
-def index():
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+@app.route("/diferencias-ia-ml")
+def IaMlDifferences():
+    return render_template("diferencias-ia-ml.html")
+
+@app.route('/casos-de-exito-ml')
+def successCases():
     casesList = [
         {
             'title': 'Diagnóstico Médico Asistido por IA',
@@ -38,8 +47,9 @@ def index():
             'referenceUrl': 'https://blog.beservices.es/blog/ejemplos-de-machine-learning-en-empresas'
         }
     ]
-    return render_template('index.html', cases=casesList)
-@app.route("/linearregressionpage", methods=["GET", "POST"])
+    return render_template('casos-de-exito-ml.html', cases=casesList)
+
+@app.route("/regresion-lineal", methods=["GET", "POST"])
 def calculateGrade():
     calculateResult = None
     plot_url = None
@@ -54,15 +64,14 @@ def calculateGrade():
             calculateResult = "Invalid input. Please enter a number."
             plot_url = None  # Evita mostrar una gráfica si hay error en la entrada
     
-    return render_template("linearRegressionGrades.html", result=calculateResult, plot_url=plot_url, hours=hours)
-
+    return render_template("regresion-lineal-prediccion-notas.html", result=calculateResult, plot_url=plot_url, hours=hours)
 
 @app.route("/mapa-mental")
-def MapaMental():
-    return render_template("MapaMental.html")
+def mindMap():
+    return render_template("mapa-mental-regresion-logistica.html")
 
-@app.route('/RegresionLogistica')
-def RegresionLogistica():
+@app.route('/regresion-logistica')
+def LogisticRegression():
     try:
         # 1. Generar datos
         df = modelo.generar_datos()
@@ -81,7 +90,7 @@ def RegresionLogistica():
         
         # Renderizar plantilla con todos los datos
         return render_template(
-            'RegresionLogistica.html',
+            'regresion-logistica-ml.html',
             stats={
                 "total": len(df),
                 "enfermos": int(df["Enfermedad"].sum()),

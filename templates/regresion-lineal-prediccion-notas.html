@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='regresion-lineal.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200..1000&display=swap" rel="stylesheet">
+    <title>Predicción de notas con Regresión Lineal</title>
+</head>
+<body>
+    <div class="container">
+        <nav class="container__sidebar">
+            <h1>Machine Learning</h1>
+            <ul>
+                <li><a href="/diferencias-ia-ml">Diferencias IA y ML</a></li>
+                <li><a href="/casos-de-exito-ml">Casos de Éxito ML</a></li>
+                <li class="active"><a href="/regresion-lineal">Regresión Lineal</a></li>
+                <li><a href="/mapa-mental">Mapa Mental</a></li>
+                <li><a href="/regresion-logistica">Regresión Logística</a></li>
+            </ul>
+        </nav>
+        <main class="container__content" id="main-content">
+            <h1>Regresion Lineal: Calculador de Edad basado en la frecuencia cardiaca</h1>
+
+            <form method="post">
+                <label for="Edad">Edad</label>
+                <input type="number" name="Hours" step="0.1" required>
+                <button type="submit">Calcular</button>
+            </form>
+        
+            {% if plot_url %}
+                <h2>Grafico de Regresion Lineal</h2>
+                <div class="cards-container">
+                    <img src="data:image/png;base64,{{ plot_url }}" alt="Regression Graph">
+                    <img src="data:image/png;base64,{{ plot_url }}" alt="Regression Plot">
+                </div>
+            {% endif %}
+        
+        </main>
+    </div>
+    <footer>
+        <p>Grupo #2 - Machine Learning | &copy; 2025</p>
+        <p>Jennifer Andrea Espitia | Kelly Johanna Garzon Jenny | Ruben Esteban Rodriguez | Jenny Paola Rodriguez</p>
+    </footer>
+</body>
+</html>
