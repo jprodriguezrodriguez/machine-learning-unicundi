@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, g
 import linearRegressionML as lr
-from DatasetCardiovascular import SaludModel 
+from DatasetCardiovascular import SaludModel
+import sqlite3
 
 app = Flask(__name__)
 modelo = SaludModel()
+
+DATABASE = 'modelos.db'
 
 @app.route("/")
 def home():
@@ -109,6 +112,25 @@ def LogisticRegression():
     except Exception as e:
         print(f"\nERROR CRÍTICO: {str(e)}")
         return f"Error al generar datos: {str(e)}", 500
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+    return db
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
+
+@app.route('/modelo-supervisado/<int:modelo_id>')
+def mostrar_modelo(modelo_id):
+    cur = get_db().cursor()
+    cur.execute("SELECT * FROM modelos WHERE id = ?", (modelo_id,))
+    modelo = cur.fetchone()
+    return render_template('modelos-supervisados.html', modelo=modelo)
 
 if __name__ == "__main__":
     app.run(debug=True)
