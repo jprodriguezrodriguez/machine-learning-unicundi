@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, g
 import linearRegressionML as lr
 from DatasetCardiovascular import SaludModel
 import sqlite3
+import traceback  
+import os  
 
 app = Flask(__name__)
 modelo = SaludModel()
@@ -73,45 +75,99 @@ def calculateGrade():
 def mindMap():
     return render_template("mapa-mental-regresion-logistica.html")
 
-@app.route('/regresion-logistica')
-def LogisticRegression():
+@app.route('/regresion-logistica')  
+def regresion_logistica():
     try:
-        # 1. Generar datos
+        # Inicializar modelo
+        modelo = SaludModel()  
+        
+        # 1. Generar y preparar datos
         df = modelo.generar_datos()
         if df.empty:
             raise ValueError("El DataFrame generado está vacío")
         
-        # 2. Entrenar modelo
+        # 2. Entrenar modelo y obtener métricas
         metricas = modelo.entrenar_modelo()
-        
-        # 3. Obtener datos para tabla (VERIFICACIÓN CRÍTICA)
+        required_metrics = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc', 'confusion', 'y_pred']
+        if not all(m in metricas for m in required_metrics):
+            missing = [m for m in required_metrics if m not in metricas]
+            raise ValueError(f"Métricas faltantes: {', '.join(missing)}")
+
+        # 3. Generar gráficos (con manejo de errores individual)
+        graficos = {}
+        try:
+            graficos['edad_presion'] = modelo.generar_grafico_edad_presion()
+            graficos['confusion'] = modelo.generar_grafico_confusion()
+            graficos['roc'] = modelo.generar_curva_roc()
+            graficos['metricas'] = modelo.generar_grafico_metricas()
+            graficos['coeficientes'] = modelo.generar_grafico_coeficientes()
+        except Exception as e:
+            print(f"Error generando gráficos: {str(e)}")
+            # Puedes continuar aunque falle algún gráfico
+
+        # 4. Preparar datos para la tabla
         tabla_datos = modelo.get_datos_para_tabla()
         if not tabla_datos:
-            raise ValueError("No se obtuvieron datos para la tabla")
-        
-        print("\nDEBUG: Datos para tabla (primer registro):", tabla_datos[0])
-        
-        # Renderizar plantilla con todos los datos
+            print("Advertencia: Tabla de datos vacía")
+            tabla_datos = []
+
+        # 5. Calcular estadísticas
+        stats = {
+            "total": len(df),
+            "enfermos": int(df["Enfermedad"].sum()),
+            "sanos": len(df) - int(df["Enfermedad"].sum()),
+            "edad_promedio": round(df["Edad"].mean(), 1),
+            "presion_promedio": round(df["Presion"].mean(), 1),
+            "colesterol_promedio": round(df["Colesterol"].mean(), 1),
+            "accuracy": round(metricas["accuracy"] * 100, 1),
+            "auc": round(metricas["roc_auc"] * 100, 1)
+        }
+
+        # 6. Renderizar plantilla
         return render_template(
-            'regresion-logistica-ml.html',
-            stats={
-                "total": len(df),
-                "enfermos": int(df["Enfermedad"].sum()),
-                "sanos": len(df) - int(df["Enfermedad"].sum()),
-                "edad_promedio": round(df["Edad"].mean(), 1),
-                "presion_promedio": round(df["Presion"].mean(), 1),
-                "colesterol_promedio": round(df["Colesterol"].mean(), 1),
-                "accuracy": round(metricas["accuracy"] * 100, 1)
+            'regresion-logistica-ml.html',  # Asegúrate que coincida con tu archivo
+            stats=stats,
+            metrics={
+                "accuracy": metricas["accuracy"],
+                "precision": metricas["precision"],
+                "recall": metricas["recall"],
+                "f1": metricas["f1"],
+                "roc_auc": metricas["roc_auc"],
+                "confusion": metricas["confusion"]
             },
-            grafico_edad_presion=modelo.generar_grafico_edad_presion(),
-            grafico_confusion=modelo.generar_grafico_confusion(),
-            confusion_matrix=metricas["confusion"],
-            tabla_datos=tabla_datos
+            grafico_edad_presion=graficos.get('edad_presion'),
+            grafico_confusion=graficos.get('confusion'),
+            graficos={
+                "roc": graficos.get('roc'),
+                "coeficientes": graficos.get('coeficientes'),
+                "metricas": graficos.get('metricas')
+            },
+            tabla_datos=tabla_datos,
+            predicciones=metricas.get("y_pred", [])
         )
         
     except Exception as e:
-        print(f"\nERROR CRÍTICO: {str(e)}")
-        return f"Error al generar datos: {str(e)}", 500
+        # Obtener información del error
+        error_msg = f"Error al procesar la regresión logística: {str(e)}"
+        error_details = traceback.format_exc() if app.debug else None
+        
+        # Registrar el error
+        app.logger.error(f"Error en regresion_logistica: {error_msg}\n{error_details}")
+        
+        # Verificar si la plantilla existe antes de renderizar
+        template_path = os.path.join(app.root_path, 'templates', 'error.html')
+        if not os.path.exists(template_path):
+            return f"""
+            <h1>Error crítico</h1>
+            <p>{error_msg}</p>
+            <pre>{error_details if app.debug else 'Habilita el modo debug para ver detalles'}</pre>
+            """, 500
+            
+        return render_template(
+            'error.html',
+            error_message=error_msg,
+            error_details=error_details
+        ), 500
 
 def get_db():
     db = getattr(g, '_database', None)

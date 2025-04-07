@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .error-container { max-width: 800px; margin: 0 auto; }
+        .error-message { color: #d9534f; background: #f8d7da; padding: 15px; border-radius: 4px; }
+        .error-details { margin-top: 20px; padding: 15px; background: #f1f1f1; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1>Ocurrió un error</h1>
+        
+        <div class="error-message">
+            {{ error_message }}
+        </div>
+
+        {% if error_details %}
+        <div class="error-details">
+            <h3>Detalles técnicos:</h3>
+            <pre>{{ error_details }}</pre>
+        </div>
+        {% endif %}
+
+        <p><a href="/">Volver al inicio</a></p>
+    </div>
+</body>
+</html>

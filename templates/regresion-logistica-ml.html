@@ -67,7 +67,43 @@
                     <div class="stat-value">{{ stats.accuracy }}%</div>
                     <div class="stat-label">Precisión del Modelo</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.auc }}%</div>
+                    <div class="stat-label">AUC-ROC</div>
+                </div>
             </div>
+
+            <div class="card metrics-card">
+                <h2>Métricas del Modelo</h2>
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <div class="metric-title">Accuracy (Exactitud)</div>
+                        <div class="stat-value">{{ metrics.accuracy|round(2) }}</div>
+                        <p class="metric-description">Porcentaje de predicciones correctas</p>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">Precision</div>
+                        <div class="stat-value">{{ metrics.precision|round(2) }}</div>
+                        <p class="metric-description">Verdaderos positivos / Predicciones positivas</p>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">Recall (Sensibilidad)</div>
+                        <div class="stat-value">{{ metrics.recall|round(2) }}</div>
+                        <p class="metric-description">Verdaderos positivos / Reales positivos</p>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">F1-Score</div>
+                        <div class="stat-value">{{ metrics.f1|round(2) }}</div>
+                        <p class="metric-description">Media armónica de precision y recall</p>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">AUC-ROC</div>
+                        <div class="stat-value">{{ metrics.roc_auc|round(2) }}</div>
+                        <p class="metric-description">Área bajo la curva ROC</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="cards-container">
                 <div class="card">
                     <h2>Relación Edad-Presión Arterial</h2>
@@ -86,11 +122,31 @@
                 </div>
             </div>
             
-            <div class="table-card">
+            <div class="cards-container">
+                <div class="card">
+                    <h2>Curva ROC</h2>
+                    <img src="data:image/png;base64,{{ graficos.roc }}" alt="Curva ROC">
+                    <p class="graph-caption">Performance del modelo en todos los umbrales de clasificación</p>
+                </div>
+                
+                <div class="card">
+                    <h2>Importancia de Características</h2>
+                    <img src="data:image/png;base64,{{ graficos.coeficientes }}" alt="Importancia de características">
+                    <p class="graph-caption">Contribución de cada variable en el modelo predictivo</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Métricas de Evaluación</h2>
+                <img src="data:image/png;base64,{{ graficos.metricas }}" alt="Métricas del modelo">
+                <p class="graph-caption">Comparación de las principales métricas de evaluación</p>
+            </div>
+
+            <div class="card table-card">
                 <h2>Tabla Completa de 100 Pacientes</h2>
                 
                 {% if not tabla_datos %}
-                <div style="color: red; padding: 20px; background: #ffeeee; border-radius: 8px;">
+                <div class="error-warning">
                     ¡Advertencia! No se recibieron datos para mostrar en la tabla.
                 </div>
                 {% else %}
@@ -104,6 +160,7 @@
                                 <th>Colesterol</th>
                                 <th>Síntomas</th>
                                 <th>Estado</th>
+                                <th>Predicción</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -130,14 +187,24 @@
                                         {{ 'Enfermo' if dato['Enfermedad'] == 1 else 'Sano' }}
                                     </span>
                                 </td>
+                                <td>
+                                    {% if predicciones is defined and predicciones|length > 0 %}
+                                    <span class="badge {{ 
+                                        'badge-enfermo' if predicciones[loop.index0] == 1 
+                                        else 'badge-sano' 
+                                    }}">
+                                        {{ 'Enfermo' if predicciones[loop.index0] == 1 else 'Sano' }}
+                                    </span>
+                                    {% else %}
+                                    <span class="na-value">N/A</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                <p style="text-align: center; color: #666; margin-top: 10px;">
-                    Mostrando {{ tabla_datos|length }} registros de 100
-                </p>
+                <p class="table-count">Mostrando {{ tabla_datos|length }} registros de 100</p>
                 {% endif %}
             </div>
         </main>
