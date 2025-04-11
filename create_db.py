@@ -12,6 +12,7 @@ cursor.execute('''
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre TEXT NOT NULL,
         descripcion TEXT NOT NULL,
+        nombre_de_fuente TEXT NOT NULL,
         fuente TEXT NOT NULL,
         grafico TEXT
     )
@@ -31,7 +32,7 @@ modelos = [
         "descripcion": "<p>El algoritmo k vecinos más cercanos (KNN) es un clasificador de aprendizaje supervisado no paramétrico que utiliza la proximidad para hacer clasificaciones o predicciones sobre la agrupación de un punto de datos individual. Es uno de los clasificadores de clasificación y regresión más populares y sencillos que se utilizan en machine learning hoy en día.</p> <p>Aunque el algoritmo KNN se puede usar para problemas de regresión o clasificación, se suele utilizar como un algoritmo de clasificación, que parte de la suposición de que se pueden encontrar puntos similares cerca unos de otros.</p>",
         "nombre_de_fuente": "IMB - ¿Qué es el algoritmo KNN?",
         "fuente": "https://es.wikipedia.org/wiki/Algoritmo_de_los_k_vecinos_m%C3%A1s_pr%C3%B3ximos",
-        "imagen_url": "https://www.ibm.com/es-es/think/topics/knn"
+        "imagen_url": "k_nearest_neighbors.png"
     },
     {
         "nombre": "Árboles de Decisión",
@@ -71,9 +72,9 @@ modelos = [
 ]
 
 # Convertir a lista de tuplas para insertar correctamente
-datos = [(m["nombre"], m["descripcion"], m["fuente"], m["imagen_url"]) for m in modelos]
+datos = [(m["nombre"], m["descripcion"], m["nombre_de_fuente"], m["fuente"], m["imagen_url"]) for m in modelos]
 
-cursor.executemany('INSERT INTO modelos (nombre, descripcion, fuente, grafico) VALUES (?, ?, ?, ?)', datos)
+cursor.executemany('INSERT INTO modelos (nombre, descripcion, nombre_de_fuente, fuente, grafico) VALUES (?, ?, ?, ?, ?)', datos)
 
 # Guardar los cambios y cerrar
 conn.commit()
