@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h2>Selecciona la variable objetivo</h2>
+    <form method="POST" action="/ejecutar_modelo">
+        <label for="target">Variable objetivo:</label>
+        <select name="target" id="target">
+            {% for col in columnas %}
+            <option value="{{ col }}">{{ col }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Ejecutar modelo</button>
+    </form>
+
+</body>
+
+</html>

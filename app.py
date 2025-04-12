@@ -1,14 +1,26 @@
-from flask import Flask, render_template, request, g
+from flask import Flask, render_template, request, g, send_file
 import linearRegressionML as lr
 from DatasetCardiovascular import SaludModel
+from ExcelProcessor import ExcelProcessor
 import sqlite3
 import traceback  
-import os  
+import os
+import pandas as pd
+from openpyxl import load_workbook
+from openpyxl.drawing.image import Image as OpenPyXLImage  
 
 app = Flask(__name__)
 modelo = SaludModel()
-
+UPLOAD_FOLDER = 'archivos_cargados'
+PROCESSED_FOLDER = 'archivos_procesados'
+ALLOWED_EXTENSIONS = {'xlsx', 'csv'}
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(PROCESSED_FOLDER, exist_ok=True)
 DATABASE = 'modelos.db'
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @app.route("/")
 def home():
@@ -187,6 +199,77 @@ def mostrar_modelo(modelo_id):
     cur.execute("SELECT * FROM modelos WHERE id = ?", (modelo_id,))
     modelo = cur.fetchone()
     return render_template('modelos-supervisados.html', modelo=modelo)
+
+@app.route('/regresion-logistica-excel', methods=['GET', 'POST'])
+def subir_archivo():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file:
+            filename = file.filename
+            ext = os.path.splitext(filename)[1].lower()
+
+            if ext == '.csv':
+                df = pd.read_csv(file)
+            elif ext in ['.xlsx', '.xls']:
+                df = pd.read_excel(file)
+            else:
+                return "Formato de archivo no soportado", 400
+
+            # Guardamos en sesión o pasamos el DataFrame a una plantilla
+            columnas = df.columns.tolist()
+
+            # Opcional: guardar el dataframe en disco o en sesión
+            df.to_csv('archivo_temporal.csv', index=False)
+
+            return render_template('regresion-logistica-excel/seleccionar-columna.html', columnas=columnas)
+
+    return render_template('regresion-logistica-excel/cargar-archivo.html') 
+
+@app.route('/ejecutar_modelo', methods=['POST'])
+def ejecutar_modelo():
+    target = request.form['target']
+
+    df = pd.read_csv('archivo_temporal.csv')  # O usar sesión si prefieres
+
+    X = df.drop(columns=[target])
+    y = df[target]
+
+    # Aquí podrías hacer codificación si es necesario
+    model = LogisticRegression(max_iter=1000)
+    model.fit(X, y)
+
+    score = model.score(X, y)
+    return f'Modelo entrenado. Precisión: {score:.2%}'
+
+def regresion_logistica_excel():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            ext = filename.rsplit('.', 1)[1].lower()
+            path = os.path.join(UPLOAD_FOLDER, filename)
+            file.save(path)
+
+            processor = ExcelProcessor(path, file_type=ext)
+            df, metrics_df, conf_df, image_stream = processor.train_and_predict()
+
+            output_path = os.path.join(PROCESSED_FOLDER, 'resultado_' + filename)
+            
+            with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False, sheet_name='Resultados')
+                metrics_df.to_excel(writer, sheet_name='Métricas')
+                conf_df.to_excel(writer, sheet_name='Matriz de Confusión')
+
+            wb = load_workbook(output_path)
+            ws = wb['Matriz de Confusión']
+            img = OpenPyXLImage(image_stream)
+            img.anchor = 'E2'
+            ws.add_image(img)
+            wb.save(output_path)
+
+            return send_file(output_path, as_attachment=True)
+
+    return render_template('regresion-logistica-excel.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

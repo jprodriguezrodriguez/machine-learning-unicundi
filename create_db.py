@@ -23,14 +23,14 @@ modelos = [
     {
         "nombre": "Regresión Logística",
         "descripcion": "<p>La regresión logística estima la probabilidad de que ocurra un evento, como votar o no votar, en función de un conjunto de datos dado de variables independientes.</p><p>Este tipo de modelo estadístico (también conocido como modelo logit) se utiliza a menudo para la clasificación y el análisis predictivo. Dado que el resultado es una probabilidad, la variable dependiente está acotada entre 0 y 1. En la regresión logística, se aplica una transformación logit sobre las probabilidades, es decir, la probabilidad de éxito dividida por la probabilidad de fracaso.</p>",
-        "nombre_de_fuente": "IMB - ¿Qué es la regresión logística?",
+        "nombre_de_fuente": "IBM - ¿Qué es la regresión logística?",
         "fuente": "https://www.ibm.com/es-es/topics/logistic-regression",
         "imagen_url": "regresion_logistica.png"
     },
     {
         "nombre": "K-Nearest Neighbors (KNN)",
         "descripcion": "<p>El algoritmo k vecinos más cercanos (KNN) es un clasificador de aprendizaje supervisado no paramétrico que utiliza la proximidad para hacer clasificaciones o predicciones sobre la agrupación de un punto de datos individual. Es uno de los clasificadores de clasificación y regresión más populares y sencillos que se utilizan en machine learning hoy en día.</p> <p>Aunque el algoritmo KNN se puede usar para problemas de regresión o clasificación, se suele utilizar como un algoritmo de clasificación, que parte de la suposición de que se pueden encontrar puntos similares cerca unos de otros.</p>",
-        "nombre_de_fuente": "IMB - ¿Qué es el algoritmo KNN?",
+        "nombre_de_fuente": "Wikipedia - ¿Qué es el algoritmo KNN?",
         "fuente": "https://es.wikipedia.org/wiki/Algoritmo_de_los_k_vecinos_m%C3%A1s_pr%C3%B3ximos",
         "imagen_url": "k_nearest_neighbors.png"
     },
@@ -44,14 +44,14 @@ modelos = [
     {
         "nombre": "Random Forest",
         "descripcion": "<p>El bosque aleatorio es un algoritmo de aprendizaje automático de uso común, registrado por Leo Breiman y Adele Cutler, que combina el resultado de múltiples árboles de decisión para llegar a un resultado único. Su facilidad de uso y flexibilidad han impulsado su adopción, ya que maneja problemas de clasificación y regresión.</p><p>El algoritmo de bosque aleatorio es una extensión del método bagging o embolsado, ya que emplea tanto el embolsado como la aleatoriedad de características para crear un bosque de árboles de decisión que no están correlacionados. La aleatoriedad de características, también conocida como embolsado de características o “método aleatorio del subespacio”, genera un subconjunto aleatorio de características, lo que garantiza una baja correlación entre los árboles de decisión. Esta es una diferencia fundamental entre los árboles de decisión y los bosques aleatorios. Mientras que los árboles de decisión consideran todas las posibles divisiones de características, los bosques aleatorios solo seleccionan un subconjunto de esas características.</p>",
-        "nombre_de_fuente": "IMB - ¿Qué es el bosque aleatorio?",
+        "nombre_de_fuente": "IBM - ¿Qué es el bosque aleatorio?",
         "fuente": "https://www.ibm.com/mx-es/think/topics/random-forest",
         "imagen_url": "random_forest.png"
     },
     {
         "nombre": "Support Vector Machine (SVM)",
         "descripcion": "<p>Una máquina de vectores de soporte (SVM) es un algoritmo de aprendizaje automático supervisado que clasifica los datos al encontrar una línea o hiperplano óptimo que maximice la distancia entre cada clase en un espacio N-dimensional.</p><p>Las SVM fueron desarrolladas en la década de 1990 por Vladimir N. Vapnik y sus colegas, y publicaron este trabajo en un artículo titulado 'Support Vector Method for Function Approximation, Regression Estimation, and Signal Processing' en 1995.</p><p>Las SVM se emplean comúnmente en problemas de clasificación. Distinguen entre dos clases encontrando el hiperplano óptimo que maximiza el margen entre los puntos de datos más cercanos de clases opuestas. El número de características en los datos de entrada determina si el hiperplano es una línea en un espacio bidimensional o un plano en un espacio n-dimensional. Dado que se pueden encontrar múltiples hiperplanos para diferenciar clases, la maximización del margen entre puntos permite al algoritmo encontrar la mejor frontera de decisión entre clases. Esto, a su vez, le permite generalizar bien nuevos datos y hacer predicciones de clasificación precisas. Las líneas adyacentes al hiperplano óptimo se conocen como vectores de soporte, ya que estos vectores atraviesan los puntos de datos que determinan el margen máximo.</p>",
-        "nombre_de_fuente": "IMB - ¿Qué son las SVM?",
+        "nombre_de_fuente": "IBM - ¿Qué son las SVM?",
         "fuente": "https://www.ibm.com/mx-es/think/topics/support-vector-machine",
         "imagen_url": "support_vector_machine.png"
     },
