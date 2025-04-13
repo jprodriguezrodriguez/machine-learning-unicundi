@@ -1,14 +1,36 @@
-from flask import Flask, render_template, request, g
+from flask import Flask, render_template, request, g, send_file, url_for
 import linearRegressionML as lr
 from DatasetCardiovascular import SaludModel
+from ExcelProcessor import ExcelProcessor
 import sqlite3
 import traceback  
-import os  
+import os
+import pandas as pd
+from openpyxl import load_workbook
+from openpyxl.drawing.image import Image as OpenPyXLImage
+from sklearn.linear_model import LogisticRegression
+from werkzeug.utils import secure_filename
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+from io import BytesIO
+import seaborn as sns
+from datetime import datetime
+import tempfile
 
 app = Flask(__name__)
 modelo = SaludModel()
-
+UPLOAD_FOLDER = 'archivos_cargados'
+PROCESSED_FOLDER = 'static/archivos_procesados'
+ALLOWED_EXTENSIONS = {'xlsx', 'csv'}
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(PROCESSED_FOLDER, exist_ok=True)
 DATABASE = 'modelos.db'
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @app.route("/")
 def home():
@@ -187,6 +209,160 @@ def mostrar_modelo(modelo_id):
     cur.execute("SELECT * FROM modelos WHERE id = ?", (modelo_id,))
     modelo = cur.fetchone()
     return render_template('modelos-supervisados.html', modelo=modelo)
+
+@app.route('/regresion-logistica-excel', methods=['GET', 'POST'])
+def subir_archivo():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file:
+            filename = file.filename
+            ext = os.path.splitext(filename)[1].lower()
+
+            if ext == '.csv':
+                df = pd.read_csv(file, sep=';')
+            elif ext in ['.xlsx', '.xls']:
+                df = pd.read_excel(file)
+            else:
+                return "Formato de archivo no soportado", 400
+
+            columnas = df.columns.tolist()
+            df.to_csv('archivo_temporal.csv', index=False)
+
+            return render_template('regresion-logistica-excel/seleccionar-columna.html', columnas=columnas)
+
+    return render_template('regresion-logistica-excel/cargar-archivo.html') 
+
+@app.route('/ejecutar_modelo', methods=['POST'])
+def ejecutar_modelo():
+    target = request.form['target']
+    df = pd.read_csv('archivo_temporal.csv')
+
+    X = df.drop(columns=[target])
+    y = df[target]
+
+    model = LogisticRegression(max_iter=1000, multi_class='ovr')
+    model.fit(X, y)
+
+    y_pred = model.predict(X)
+    y_proba = model.predict_proba(X)[:, 1]
+
+    acc = accuracy_score(y, y_pred)
+    prec = precision_score(y, y_pred, average='weighted')
+    rec = recall_score(y, y_pred, average='weighted')
+    f1 = f1_score(y, y_pred, average='weighted')
+    # Matriz de confusión multiclase
+    conf_matrix = confusion_matrix(y, y_pred)
+
+    print(f"Forma de la matriz de confusión: {conf_matrix.shape}")
+    print(f"Clases en y: {y.unique()}")
+    print(f"Clases en y_pred: {np.unique(y_pred)}")
+
+
+    df_resultado = X.copy()
+    df_resultado['Columna de Análisis'] = target
+    df_resultado['Valor de origen'] = y
+    df_resultado['Predicción'] = y_pred
+    df_resultado['Probabilidad'] = y_proba
+
+    df_metricas = pd.DataFrame({
+        'Métrica': ['Accuracy (Precisión Global)', 'Precision (Precisión en Casos Positivos)', 'Recall (Sensibilidad o Tasa de Detección)', 'F1 Score (Equilibrio entre Precisión y Detección)'],
+        'Valor': [acc, prec, rec, f1]
+    })
+
+    df_confusion = pd.DataFrame(
+        conf_matrix,
+        index=[f'Real {c}' for c in np.unique(y)],
+        columns=[f'Pred {c}' for c in np.unique(y)]
+    )
+    
+    ts = int(datetime.now().timestamp())
+    
+    # Guardar el Excel en static/resultados
+    excel_name = f'reporte_modelo_{ts}.xlsx'
+    excel_path = os.path.join(PROCESSED_FOLDER, excel_name)
+
+    # == Guardar en Excel == #
+    output_excel = 'reporte_modelo_completo.xlsx'
+    with pd.ExcelWriter(excel_path, engine='openpyxl') as writer:
+        df_resultado.to_excel(writer, index=False, sheet_name='Resultados')
+        df_metricas.to_excel(writer, index=False, sheet_name='Métricas')
+        df_confusion.to_excel(writer, sheet_name='Matriz de Confusión')
+    
+    # --- Generar imágenes en archivos temporales --- #
+    # Heatmap
+    heatmap_path = os.path.join(PROCESSED_FOLDER, f'heatmap_{ts}.png')
+    plt.figure(figsize=(8,6))
+    sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues',
+                xticklabels=np.unique(y), yticklabels=np.unique(y))
+    plt.title('Matriz de Confusión')
+    plt.tight_layout()
+    plt.savefig(heatmap_path)
+    plt.close()
+
+    # Scatter de probabilidades
+    scatter_path = os.path.join(PROCESSED_FOLDER, f'scatter_{ts}.png')
+    plt.figure(figsize=(6,4))
+    plt.scatter(range(len(y_proba)), y_proba, c=y, cmap='bwr', alpha=0.7)
+    plt.title('Probabilidades de predicción')
+    plt.ylabel('Probabilidad de clase positiva')
+    plt.xlabel('Índice de muestra')
+    plt.tight_layout()
+    plt.savefig(scatter_path)
+    plt.close()
+
+    # Insertar heatmap en el Excel
+    wb = load_workbook(excel_path)
+    ws = wb['Matriz de Confusión']
+    img = OpenPyXLImage(heatmap_path)
+    img.anchor = 'E2'
+    ws.add_image(img)
+    wb.save(excel_path)
+    
+    # Insertar Scatter de probabilidades en el Excel
+    wb = load_workbook(excel_path)
+    ws = wb['Métricas']
+    img = OpenPyXLImage(scatter_path)
+    img.anchor = 'E2'
+    ws.add_image(img)
+    wb.save(excel_path)
+    
+    # Renderizar plantilla de resultados
+    return render_template('regresion-logistica-excel/resultados-regresion.html',
+                       score=f'{acc * 100:.2f}%',
+                       image_url=url_for('static', filename=f'archivos_procesados/{os.path.basename(heatmap_path)}'),
+                       excel_url=url_for('static', filename=f'archivos_procesados/{excel_name}'))
+
+    # return send_file(output_excel, as_attachment=True)
+
+def regresion_logistica_excel():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            ext = filename.rsplit('.', 1)[1].lower()
+            path = os.path.join(UPLOAD_FOLDER, filename)
+            file.save(path)
+
+            processor = ExcelProcessor(path, file_type=ext)
+            df, metrics_df, conf_df, image_stream = processor.train_and_predict()
+
+            output_path = os.path.join(PROCESSED_FOLDER, 'resultado_' + filename)
+            
+            with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False, sheet_name='Resultados')
+                metrics_df.to_excel(writer, sheet_name='Métricas')
+                conf_df.to_excel(writer, sheet_name='Matriz de Confusión')
+
+            wb = load_workbook(output_path)
+            ws = wb['Matriz de Confusión']
+            img = OpenPyXLImage(image_stream)
+            img.anchor = 'E2'
+            ws.add_image(img)
+            wb.save(output_path)
+
+            return send_file(output_path, as_attachment=True)
+
+    return render_template('regresion-logistica-excel.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

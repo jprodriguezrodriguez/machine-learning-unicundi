@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='modelos.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200..1000&display=swap" rel="stylesheet">
@@ -31,16 +32,17 @@
                     <li><a href="/modelo-supervisado/7">Naive Bayes</a></li>
                   </ul>
                 </details>
+                <li><a href="/regresion-logistica-excel">Regresión Logística con Excel</a></li>
             </ul>
         </nav>
         <main class="container__content">
             <section class="intro nmb">
                 <h1>{{ modelo[1] }}</h1>
-                <p><strong>Descripción:</strong> {{ modelo[2] }}</p>
-                <p><strong>Fuente:</strong> <a href="{{ modelo[3] }}">{{ modelo[3] }}</a></p>
-                <!-- {% if modelo[4] %}
-                  <img src="{{ url_for('static', filename='img/' + modelo[4]) }}" alt="Gráfico del modelo">
-                {% endif %} -->
+                {% if modelo[5] %}
+                  <img src="{{ url_for('static', filename='images/' + modelo[5]) }}" alt="Gráfico del modelo" class="model-img">
+                {% endif %}
+                <div class="model-description">{{ modelo[2]|safe }}</div>
+                <p><strong>Fuente:</strong> <a href="{{ modelo[4] }}" target="_blank">{{ modelo[3] }}</a></p>
             </section>
         </main>
     </div>
