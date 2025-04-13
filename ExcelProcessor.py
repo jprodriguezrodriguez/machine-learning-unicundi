@@ -2,6 +2,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from io import BytesIO
+import csv
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
 from sklearn.model_selection import train_test_split
@@ -14,13 +15,21 @@ class ExcelProcessor:
         self.model = LogisticRegression(max_iter=1000)
         self.scaler = StandardScaler()
 
+    def detect_delimiter(filepath):
+        with open(filepath, 'r', newline='', encoding='utf-8') as file:
+            dialect = csv.Sniffer().sniff(file.read(1024))
+            file.seek(0)
+            return dialect.delimiter
+
     def load_file(self, path):
         if path.endswith('.csv'):
-            return pd.read_csv(path)
+            delimiter = detect_delimiter(path)
+            return pd.read_csv(path, sep=delimiter)
         elif path.endswith('.xlsx') or path.endswith('.xls'):
             return pd.read_excel(path)
         else:
             raise ValueError("Archivo no compatible. Usa .csv o .xlsx")
+
 
     def preprocess(self):
         if 'Enfermedad' not in self.df.columns:
