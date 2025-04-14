@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Machine Learning - Landing</title>
+    <title>Casos de Éxito - ML Supervisado</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200..1000&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="container">
         <nav class="container__sidebar">
             <h1>Machine Learning</h1>
             <ul>
                 <li><a href="/diferencias-ia-ml">Diferencias IA y ML</a></li>
-                <li><a href="/casos-de-exito-ml">Casos de Éxito ML</a></li>
+                <li class="active"><a href="/casos-de-exito-ml">Casos de Éxito ML</a></li>
                 <li><a href="/regresion-lineal">Regresión Lineal</a></li>
                 <li><a href="/mapa-mental">Mapa Mental</a></li>
                 <li><a href="/regresion-logistica">Regresión Logística</a></li>
@@ -32,24 +37,19 @@
             </ul>
         </nav>
         <main class="container__content" id="main-content">
-            <div class="content__info">
-                <h1>Portafolio de Machine Learning</h1>
-                <h2>Universidad de Cundinamarca</h2>
-                <p class="description">
-                    El aprendizaje automático (<strong>Machine Learning</strong>) es una rama de la inteligencia artificial
-                    que permite a los sistemas aprender y mejorar automáticamente a partir de la experiencia sin ser
-                    programados explícitamente. Se utiliza en una amplia gama de aplicaciones, desde la predicción de datos
-                    hasta el reconocimiento de patrones en grandes volúmenes de información.
-                </p>
-                <p class="dtaU">
-                    Por ello es necesario dar a conocer el portafolio de Machine Learning, donde se encuentran
-                    diferentes aplicaciones y casos de uso que demuestran su potencial y versatilidad.
-                </p>
-                <p class="team"><strong>Integrantes del proyecto:</strong></p>
-                <p>Jennifer Andrea Espitia</p>
-                <p>Kelly Johanna Garzon</p>
-                <p>Jenny Paola Rodriguez</p>
-                <p>Ruben Esteban Rodriguez</p>
+            <h2>Casos de Éxito de Machine Learning</h2>
+            <div class="cards-container">
+                {% for case in cases %}
+                <div class="card">
+                    <h2>{{ case.title }}</h2>
+                    <p class="sector"><strong>Industria/Sector:</strong> {{ case.sector }}</p>
+                    <p class="problem"><strong>Problema resuelto:</strong> {{ case.problem }}</p>
+                    <p class="algorithm"><strong>Algoritmo utilizado:</strong> {{ case.algorithm }}</p>
+                    <p class="benefits"><strong>Beneficios obtenidos:</strong> {{ case.benefits }}</p>
+                    <p class="company"><strong>Empresa o proyecto:</strong> {{ case.company }}</p>
+                    <p class="reference"><strong>Referencia:</strong> <a href="{{case.referenceUrl}}" target="_blank">{{ case.reference }}</a></p>
+                </div>
+                {% endfor %}
             </div>
         </main>
     </div>
@@ -58,3 +58,5 @@
         <p>Jennifer Andrea Espitia | Kelly Johanna Garzon Jenny | Ruben Esteban Rodriguez | Jenny Paola Rodriguez</p>
     </footer>
 </body>
+
+</html>

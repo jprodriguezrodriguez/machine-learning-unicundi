@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Machine Learning - Landing</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='regresion-lineal.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200..1000&display=swap" rel="stylesheet">
+    <title>Predicción de notas con Regresión Lineal</title>
 </head>
 <body>
     <div class="container">
@@ -13,7 +17,7 @@
             <ul>
                 <li><a href="/diferencias-ia-ml">Diferencias IA y ML</a></li>
                 <li><a href="/casos-de-exito-ml">Casos de Éxito ML</a></li>
-                <li><a href="/regresion-lineal">Regresión Lineal</a></li>
+                <li class="active"><a href="/regresion-lineal">Regresión Lineal</a></li>
                 <li><a href="/mapa-mental">Mapa Mental</a></li>
                 <li><a href="/regresion-logistica">Regresión Logística</a></li>
                 <details>
@@ -32,25 +36,22 @@
             </ul>
         </nav>
         <main class="container__content" id="main-content">
-            <div class="content__info">
-                <h1>Portafolio de Machine Learning</h1>
-                <h2>Universidad de Cundinamarca</h2>
-                <p class="description">
-                    El aprendizaje automático (<strong>Machine Learning</strong>) es una rama de la inteligencia artificial
-                    que permite a los sistemas aprender y mejorar automáticamente a partir de la experiencia sin ser
-                    programados explícitamente. Se utiliza en una amplia gama de aplicaciones, desde la predicción de datos
-                    hasta el reconocimiento de patrones en grandes volúmenes de información.
-                </p>
-                <p class="dtaU">
-                    Por ello es necesario dar a conocer el portafolio de Machine Learning, donde se encuentran
-                    diferentes aplicaciones y casos de uso que demuestran su potencial y versatilidad.
-                </p>
-                <p class="team"><strong>Integrantes del proyecto:</strong></p>
-                <p>Jennifer Andrea Espitia</p>
-                <p>Kelly Johanna Garzon</p>
-                <p>Jenny Paola Rodriguez</p>
-                <p>Ruben Esteban Rodriguez</p>
-            </div>
+            <h1>Regresion Lineal: Calculador de Edad basado en la frecuencia cardiaca</h1>
+
+            <form method="post">
+                <label for="Edad">Edad</label>
+                <input type="number" name="Hours" step="0.1" required>
+                <button type="submit">Calcular</button>
+            </form>
+        
+            {% if plot_url %}
+                <h2>Grafico de Regresion Lineal</h2>
+                <div class="cards-container">
+                    <img src="data:image/png;base64,{{ plot_url }}" alt="Regression Graph">
+                    <img src="data:image/png;base64,{{ plot_url }}" alt="Regression Plot">
+                </div>
+            {% endif %}
+        
         </main>
     </div>
     <footer>
@@ -58,3 +59,4 @@
         <p>Jennifer Andrea Espitia | Kelly Johanna Garzon Jenny | Ruben Esteban Rodriguez | Jenny Paola Rodriguez</p>
     </footer>
 </body>
+</html>

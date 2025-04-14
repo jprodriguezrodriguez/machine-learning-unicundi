@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='regresion-logistica.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200..1000&display=swap" rel="stylesheet">
+    <title>Regresion Logistica de Salud - 100 Pacientes</title>
+</head>
+<body>
+    <div class="container">
+        <nav class="container__sidebar">
+            <h1>Machine Learning</h1>
+            <ul>
+                <li><a href="/diferencias-ia-ml">Diferencias IA y ML</a></li>
+                <li><a href="/casos-de-exito-ml">Casos de Éxito ML</a></li>
+                <li><a href="/regresion-lineal">Regresión Lineal</a></li>
+                <li><a href="/mapa-mental">Mapa Mental</a></li>
+                <li class="active"><a href="/regresion-logistica">Regresión Logística</a></li>
+                <details>
+                    <summary>Modelos de Machine Learning Supervisado de Clasificación</summary>
+                    <ul class="submenu">
+                      <li><a href="/modelo-supervisado/1">Regresión Logística</a></li>
+                      <li><a href="/modelo-supervisado/2">K-Nearest Neighbors (KNN)</a></li>
+                      <li><a href="/modelo-supervisado/3">Árboles de Decisión</a></li>
+                      <li><a href="/modelo-supervisado/4">Random Forest</a></li>
+                      <li><a href="/modelo-supervisado/5">Support Vector Machine (SVM)</a></li>
+                      <li><a href="/modelo-supervisado/6">Gradient Boosting (XGBoost, AdaBoost, etc.)</a></li>
+                      <li><a href="/modelo-supervisado/7">Naive Bayes</a></li>
+                    </ul>
+                  </details>
+                  <li><a href="/regresion-logistica-excel">Regresión Logística con Excel</a></li>
+            </ul>
+        </nav>
+        <main class="container__content" id="main-content">
+            <section class="intro nmb">
+                <h1>Análisis de Salud Cardiovascular</h1>
+                <p>
+                    Dataset completo de <strong>100</strong> pacientes con análisis predictivo
+                </p>
+            </section>
+        
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.total }}</div>
+                    <div class="stat-label">Total Pacientes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.sanos }}</div>
+                    <div class="stat-label">Pacientes Sanos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.enfermos }}</div>
+                    <div class="stat-label">Pacientes Enfermos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.edad_promedio }}</div>
+                    <div class="stat-label">Edad Promedio</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.presion_promedio }}</div>
+                    <div class="stat-label">Presión Promedio</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.accuracy }}%</div>
+                    <div class="stat-label">Precisión del Modelo</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ stats.auc }}%</div>
+                    <div class="stat-label">AUC-ROC</div>
+                </div>
+            </div>
+
+            <div class="card metrics-card">
+                <h2>Métricas del Modelo</h2>
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <div class="metric-title">Accuracy (Exactitud)</div>
+                        <div class="stat-value">{{ metrics.accuracy|round(2) }}</div>
+                        <p class="metric-description">Porcentaje de predicciones correctas</p>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">Precision</div>
+                        <div class="stat-value">{{ metrics.precision|round(2) }}</div>
+                        <p class="metric-description">Verdaderos positivos / Predicciones positivas</p>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">Recall (Sensibilidad)</div>
+                        <div class="stat-value">{{ metrics.recall|round(2) }}</div>
+                        <p class="metric-description">Verdaderos positivos / Reales positivos</p>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">F1-Score</div>
+                        <div class="stat-value">{{ metrics.f1|round(2) }}</div>
+                        <p class="metric-description">Media armónica de precision y recall</p>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">AUC-ROC</div>
+                        <div class="stat-value">{{ metrics.roc_auc|round(2) }}</div>
+                        <p class="metric-description">Área bajo la curva ROC</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cards-container">
+                <div class="card">
+                    <h2>Relación Edad-Presión Arterial</h2>
+                    <img src="data:image/png;base64,{{ grafico_edad_presion }}" alt="Edad vs Presión">
+                    <p style="text-align: center; color: #666; margin-top: 10px;">
+                        Distribución de 100 pacientes según edad y presión arterial
+                    </p>
+                </div>
+                
+                <div class="card">
+                    <h2>Matriz de Confusión</h2>
+                    <img src="data:image/png;base64,{{ grafico_confusion }}" alt="Matriz de Confusión">
+                    <p style="text-align: center; color: #666; margin-top: 10px;">
+                        Rendimiento del modelo de clasificación
+                    </p>
+                </div>
+            </div>
+            
+            <div class="cards-container">
+                <div class="card">
+                    <h2>Curva ROC</h2>
+                    <img src="data:image/png;base64,{{ graficos.roc }}" alt="Curva ROC">
+                    <p class="graph-caption">Performance del modelo en todos los umbrales de clasificación</p>
+                </div>
+                
+                <div class="card">
+                    <h2>Importancia de Características</h2>
+                    <img src="data:image/png;base64,{{ graficos.coeficientes }}" alt="Importancia de características">
+                    <p class="graph-caption">Contribución de cada variable en el modelo predictivo</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Métricas de Evaluación</h2>
+                <img src="data:image/png;base64,{{ graficos.metricas }}" alt="Métricas del modelo">
+                <p class="graph-caption">Comparación de las principales métricas de evaluación</p>
+            </div>
+
+            <div class="card table-card">
+                <h2>Tabla Completa de 100 Pacientes</h2>
+                
+                {% if not tabla_datos %}
+                <div class="error-warning">
+                    ¡Advertencia! No se recibieron datos para mostrar en la tabla.
+                </div>
+                {% else %}
+                <div class="data-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Edad</th>
+                                <th>Presión</th>
+                                <th>Colesterol</th>
+                                <th>Síntomas</th>
+                                <th>Estado</th>
+                                <th>Predicción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dato in tabla_datos %}
+                            <tr class="{{ 'enfermo' if dato['Enfermedad'] == 1 else 'sano' }}">
+                                <td>{{ dato['ID'] }}</td>
+                                <td>{{ dato['Edad'] }}</td>
+                                <td>{{ dato['Presion'] }}</td>
+                                <td>{{ dato['Colesterol'] }}</td>
+                                <td>
+                                    <span class="sintomas {{ 
+                                        'leves' if dato['Sintomas'] == 'Leves' 
+                                        else 'moderados' if dato['Sintomas'] == 'Moderados' 
+                                        else 'graves' 
+                                    }}">
+                                        {{ dato['Sintomas'] }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge {{ 
+                                        'badge-enfermo' if dato['Enfermedad'] == 1 
+                                        else 'badge-sano' 
+                                    }}">
+                                        {{ 'Enfermo' if dato['Enfermedad'] == 1 else 'Sano' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if predicciones is defined and predicciones|length > 0 %}
+                                    <span class="badge {{ 
+                                        'badge-enfermo' if predicciones[loop.index0] == 1 
+                                        else 'badge-sano' 
+                                    }}">
+                                        {{ 'Enfermo' if predicciones[loop.index0] == 1 else 'Sano' }}
+                                    </span>
+                                    {% else %}
+                                    <span class="na-value">N/A</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p class="table-count">Mostrando {{ tabla_datos|length }} registros de 100</p>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+    <footer>
+        <p>Grupo #2 - Machine Learning | &copy; 2025</p>
+        <p>Jennifer Andrea Espitia | Kelly Johanna Garzon Jenny | Ruben Esteban Rodriguez | Jenny Paola Rodriguez</p>
+    </footer>
+</body>
+</html>

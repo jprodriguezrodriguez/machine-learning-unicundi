@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Machine Learning - Landing</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='main.css') }}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200..1000&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <nav class="container__sidebar">
+        <h1>Machine Learning</h1>
+        <ul>
+          <li><a href="/diferencias-ia-ml">Diferencias IA y ML</a></li>
+          <li><a href="/casos-de-exito-ml">Casos de Éxito ML</a></li>
+          <li><a href="/regresion-lineal">Regresión Lineal</a></li>
+          <li><a href="/mapa-mental">Mapa Mental</a></li>
+          <li><a href="/regresion-logistica">Regresión Logística</a></li>
+          <details>
+            <summary>
+              Modelos de Machine Learning Supervisado de Clasificación
+            </summary>
+            <ul class="submenu">
+              <li><a href="/modelo-supervisado/1">Regresión Logística</a></li>
+              <li>
+                <a href="/modelo-supervisado/2">K-Nearest Neighbors (KNN)</a>
+              </li>
+              <li><a href="/modelo-supervisado/3">Árboles de Decisión</a></li>
+              <li><a href="/modelo-supervisado/4">Random Forest</a></li>
+              <li>
+                <a href="/modelo-supervisado/5">Support Vector Machine (SVM)</a>
+              </li>
+              <li>
+                <a href="/modelo-supervisado/6"
+                  >Gradient Boosting (XGBoost, AdaBoost, etc.)</a
+                >
+              </li>
+              <li><a href="/modelo-supervisado/7">Naive Bayes</a></li>
+            </ul>
+          </details>
+          <li class="active"><a href="/regresion-logistica-excel">Regresión Logística con Excel</a></li>
+        </ul>
+      </nav>
+      <main class="container__content" id="main-content">
+        <h2>Paso 1. Carga el archivo de datos</h2>
+        <p>Selecciona el archivo .xls o .csv que deseas analizar con el software</p>
+        <form method="POST" enctype="multipart/form-data">
+          <input type="file" name="file" accept=".csv,.xlsx,.xls" required />
+          <button type="submit">Subir</button>
+        </form>
+      </main>
+    </div>
+    <footer>
+      <p>Grupo #2 - Machine Learning | &copy; 2025</p>
+      <p>
+        Jennifer Andrea Espitia | Kelly Johanna Garzon Jenny | Ruben Esteban
+        Rodriguez | Jenny Paola Rodriguez
+      </p>
+    </footer>
+  </body>
+</html>

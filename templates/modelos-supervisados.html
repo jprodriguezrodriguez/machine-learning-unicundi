@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Machine Learning - Landing</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='modelos.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200..1000&display=swap" rel="stylesheet">
+    <title>Diferencias entre IA y Machine Learning</title>
 </head>
 <body>
     <div class="container">
@@ -16,7 +20,7 @@
                 <li><a href="/regresion-lineal">Regresión Lineal</a></li>
                 <li><a href="/mapa-mental">Mapa Mental</a></li>
                 <li><a href="/regresion-logistica">Regresión Logística</a></li>
-                <details>
+                <details class="active">
                   <summary>Modelos de Machine Learning Supervisado de Clasificación</summary>
                   <ul class="submenu">
                     <li><a href="/modelo-supervisado/1">Regresión Logística</a></li>
@@ -31,30 +35,19 @@
                 <li><a href="/regresion-logistica-excel">Regresión Logística con Excel</a></li>
             </ul>
         </nav>
-        <main class="container__content" id="main-content">
-            <div class="content__info">
-                <h1>Portafolio de Machine Learning</h1>
-                <h2>Universidad de Cundinamarca</h2>
-                <p class="description">
-                    El aprendizaje automático (<strong>Machine Learning</strong>) es una rama de la inteligencia artificial
-                    que permite a los sistemas aprender y mejorar automáticamente a partir de la experiencia sin ser
-                    programados explícitamente. Se utiliza en una amplia gama de aplicaciones, desde la predicción de datos
-                    hasta el reconocimiento de patrones en grandes volúmenes de información.
-                </p>
-                <p class="dtaU">
-                    Por ello es necesario dar a conocer el portafolio de Machine Learning, donde se encuentran
-                    diferentes aplicaciones y casos de uso que demuestran su potencial y versatilidad.
-                </p>
-                <p class="team"><strong>Integrantes del proyecto:</strong></p>
-                <p>Jennifer Andrea Espitia</p>
-                <p>Kelly Johanna Garzon</p>
-                <p>Jenny Paola Rodriguez</p>
-                <p>Ruben Esteban Rodriguez</p>
-            </div>
+        <main class="container__content">
+            <section class="intro nmb">
+                <h1>{{ modelo[1] }}</h1>
+                {% if modelo[5] %}
+                  <img src="{{ url_for('static', filename='images/' + modelo[5]) }}" alt="Gráfico del modelo" class="model-img">
+                {% endif %}
+                <div class="model-description">{{ modelo[2]|safe }}</div>
+                <p><strong>Fuente:</strong> <a href="{{ modelo[4] }}" target="_blank">{{ modelo[3] }}</a></p>
+            </section>
         </main>
     </div>
     <footer>
         <p>Grupo #2 - Machine Learning | &copy; 2025</p>
         <p>Jennifer Andrea Espitia | Kelly Johanna Garzon Jenny | Ruben Esteban Rodriguez | Jenny Paola Rodriguez</p>
     </footer>
-</body>
+</html>
