@@ -86,10 +86,10 @@ def calculateGrade():
         try:
             hours = float(request.form["Hours"])
             calculateResult = lr.calculateGrade(hours)
-            plot_url = lr.generate_plot(hours)  # Generar gráfica solo si el input es válido
+            plot_url = lr.generate_plot(hours)
         except ValueError:
             calculateResult = "Invalid input. Please enter a number."
-            plot_url = None  # Evita mostrar una gráfica si hay error en la entrada
+            plot_url = None 
     
     return render_template("regresion-lineal-prediccion-notas.html", result=calculateResult, plot_url=plot_url, hours=hours)
 
@@ -250,7 +250,8 @@ def ejecutar_modelo():
     prec = precision_score(y, y_pred, average='weighted')
     rec = recall_score(y, y_pred, average='weighted')
     f1 = f1_score(y, y_pred, average='weighted')
-    # Matriz de confusión multiclase
+    
+    # -- Configuración multiclase para la Matriz de confusión
     conf_matrix = confusion_matrix(y, y_pred)
 
     print(f"Forma de la matriz de confusión: {conf_matrix.shape}")
@@ -277,19 +278,18 @@ def ejecutar_modelo():
     
     ts = int(datetime.now().timestamp())
     
-    # Guardar el Excel en static/resultados
+    # -- Guardar el Excel en static/resultados
     excel_name = f'reporte_modelo_{ts}.xlsx'
     excel_path = os.path.join(PROCESSED_FOLDER, excel_name)
 
-    # == Guardar en Excel == #
+    # -- Almacenamiento de datos en cada una de las hojas del excel
     output_excel = 'reporte_modelo_completo.xlsx'
     with pd.ExcelWriter(excel_path, engine='openpyxl') as writer:
         df_resultado.to_excel(writer, index=False, sheet_name='Resultados')
         df_metricas.to_excel(writer, index=False, sheet_name='Métricas')
         df_confusion.to_excel(writer, sheet_name='Matriz de Confusión')
     
-    # --- Generar imágenes en archivos temporales --- #
-    # Heatmap
+    # -- Mapeo del diagrama de confusión
     heatmap_path = os.path.join(PROCESSED_FOLDER, f'heatmap_{ts}.png')
     plt.figure(figsize=(8,6))
     sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues',
@@ -299,7 +299,7 @@ def ejecutar_modelo():
     plt.savefig(heatmap_path)
     plt.close()
 
-    # Scatter de probabilidades
+    # -- Mapeo del diagrama de probabilidades
     scatter_path = os.path.join(PROCESSED_FOLDER, f'scatter_{ts}.png')
     plt.figure(figsize=(6,4))
     plt.scatter(range(len(y_proba)), y_proba, c=y, cmap='bwr', alpha=0.7)
@@ -310,7 +310,7 @@ def ejecutar_modelo():
     plt.savefig(scatter_path)
     plt.close()
 
-    # Insertar heatmap en el Excel
+    # -- Insertar heatmap en el Excel
     wb = load_workbook(excel_path)
     ws = wb['Matriz de Confusión']
     img = OpenPyXLImage(heatmap_path)
@@ -318,7 +318,7 @@ def ejecutar_modelo():
     ws.add_image(img)
     wb.save(excel_path)
     
-    # Insertar Scatter de probabilidades en el Excel
+    # -- Insertar Scatter de probabilidades en el Excel
     wb = load_workbook(excel_path)
     ws = wb['Métricas']
     img = OpenPyXLImage(scatter_path)
@@ -326,43 +326,10 @@ def ejecutar_modelo():
     ws.add_image(img)
     wb.save(excel_path)
     
-    # Renderizar plantilla de resultados
     return render_template('regresion-logistica-excel/resultados-regresion.html',
                        score=f'{acc * 100:.2f}%',
                        image_url=url_for('static', filename=f'archivos_procesados/{os.path.basename(heatmap_path)}'),
                        excel_url=url_for('static', filename=f'archivos_procesados/{excel_name}'))
-
-    # return send_file(output_excel, as_attachment=True)
-
-def regresion_logistica_excel():
-    if request.method == 'POST':
-        file = request.files['file']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            ext = filename.rsplit('.', 1)[1].lower()
-            path = os.path.join(UPLOAD_FOLDER, filename)
-            file.save(path)
-
-            processor = ExcelProcessor(path, file_type=ext)
-            df, metrics_df, conf_df, image_stream = processor.train_and_predict()
-
-            output_path = os.path.join(PROCESSED_FOLDER, 'resultado_' + filename)
-            
-            with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
-                df.to_excel(writer, index=False, sheet_name='Resultados')
-                metrics_df.to_excel(writer, sheet_name='Métricas')
-                conf_df.to_excel(writer, sheet_name='Matriz de Confusión')
-
-            wb = load_workbook(output_path)
-            ws = wb['Matriz de Confusión']
-            img = OpenPyXLImage(image_stream)
-            img.anchor = 'E2'
-            ws.add_image(img)
-            wb.save(output_path)
-
-            return send_file(output_path, as_attachment=True)
-
-    return render_template('regresion-logistica-excel.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

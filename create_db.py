@@ -1,12 +1,8 @@
 import sqlite3
 
-# Crear (o abrir si ya existe) la base de datos
 conn = sqlite3.connect('modelos.db')
-
-# Crear un cursor para ejecutar comandos SQL
 cursor = conn.cursor()
 
-# Crear la tabla
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS modelos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -18,7 +14,6 @@ cursor.execute('''
     )
 ''')
 
-# Insertar registros de ejemplo
 modelos = [
     {
         "nombre": "Regresión Logística",
@@ -71,12 +66,10 @@ modelos = [
     }
 ]
 
-# Convertir a lista de tuplas para insertar correctamente
 datos = [(m["nombre"], m["descripcion"], m["nombre_de_fuente"], m["fuente"], m["imagen_url"]) for m in modelos]
 
 cursor.executemany('INSERT INTO modelos (nombre, descripcion, nombre_de_fuente, fuente, grafico) VALUES (?, ?, ?, ?, ?)', datos)
 
-# Guardar los cambios y cerrar
 conn.commit()
 conn.close()
 
