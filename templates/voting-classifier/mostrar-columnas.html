@@ -48,17 +48,25 @@
               <li><a href="/modelo-supervisado/7">Naive Bayes</a></li>
             </ul>
           </details>
-          <li class="active"><a href="/regresion-logistica-excel">Regresión Logística con Excel</a></li>
-          <li><a href="/voting-classifier">Voting Classifier | Heart Disease</a></li>
+          <li><a href="/regresion-logistica-excel">Regresión Logística con Excel</a></li>
+          <li class="active"><a href="/voting-classifier">Voting Classifier | Heart Disease</a></li>
         </ul>
       </nav>
       <main class="container__content" id="main-content">
-        <h2>Paso 1. Carga el archivo de datos</h2>
-        <p>Selecciona el archivo .xls o .csv que deseas analizar con el software</p>
-        <form method="POST" enctype="multipart/form-data">
-          <input type="file" name="file" accept=".csv,.xlsx,.xls" required />
-          <button type="submit">Subir</button>
+        <h2>Paso 2. ¿Deseas añadir información?</h2>
+        <p>A continuación, puedes añadir información al dataset mostrado en pantalla.</p>
+        <form method="POST" action="/ejecutar_modelo">
+          <select name="target" id="target">
+            {% for col in columnas %}
+            <option value="{{ col }}">{{ col }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit">Ejecutar modelo</button>
         </form>
+        <h2>Tabla de datos cargada</h2>
+        <div class="table-card">
+            {{ tabla|safe }}
+        </div>
       </main>
     </div>
     <footer>

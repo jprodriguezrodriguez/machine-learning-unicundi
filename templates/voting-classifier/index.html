@@ -48,13 +48,18 @@
               <li><a href="/modelo-supervisado/7">Naive Bayes</a></li>
             </ul>
           </details>
-          <li class="active"><a href="/regresion-logistica-excel">Regresión Logística con Excel</a></li>
-          <li><a href="/voting-classifier">Voting Classifier | Heart Disease</a></li>
+          <li><a href="/regresion-logistica-excel">Regresión Logística con Excel</a></li>
+          <li class="active"><a href="/voting-classifier">Voting Classifier | Heart Disease</a></li>
         </ul>
       </nav>
       <main class="container__content" id="main-content">
         <h2>Paso 1. Carga el archivo de datos</h2>
-        <p>Selecciona el archivo .xls o .csv que deseas analizar con el software</p>
+        <p>Selecciona el archivo .xls o .csv que deseas analizar con el software. Ten en cuenta que debe contar mínimo con las siguientes columnas:</p>
+        <ul>
+            <li>Edad</li>
+            <li>Presion_Arterial_Reposo</li>
+            <li>Colesterol</li>
+        </ul>
         <form method="POST" enctype="multipart/form-data">
           <input type="file" name="file" accept=".csv,.xlsx,.xls" required />
           <button type="submit">Subir</button>
