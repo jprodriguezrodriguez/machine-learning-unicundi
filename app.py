@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, g, send_file, url_for, send_from_directory
+from flask import Flask, render_template, request, g, send_file, url_for
 import linearRegressionML as lr
 from DatasetCardiovascular import SaludModel
 from ExcelProcessor import ExcelProcessor
@@ -15,15 +15,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from io import BytesIO
-import io
 import seaborn as sns
 from datetime import datetime
 import tempfile
-from VotingClassifierModel import VotingClassifierModel
 
 app = Flask(__name__)
 modelo = SaludModel()
-
 UPLOAD_FOLDER = 'archivos_cargados'
 PROCESSED_FOLDER = 'static/archivos_procesados'
 ALLOWED_EXTENSIONS = {'xlsx', 'csv'}
@@ -333,84 +330,6 @@ def ejecutar_modelo():
                        score=f'{acc * 100:.2f}%',
                        image_url=url_for('static', filename=f'archivos_procesados/{os.path.basename(heatmap_path)}'),
                        excel_url=url_for('static', filename=f'archivos_procesados/{excel_name}'))
-
-@app.route('/voting-classifier', methods=['GET', 'POST'])
-def loadFileVotingClassifier():
-    modelo = VotingClassifierModel('static/heart_disease_dataset_processed.xlsx')
-    modelo.splitDataset()
-    modelo.buildVotingModel()
-    modelo.trainModel()
-    modelo.evaluateModel()
-    modelo.saveModelJoblib('models/voting_model_heart.joblib')
-    ts = int(datetime.now().timestamp())
-    if request.method == 'POST':
-        file = request.files['file']
-        if file:
-            filename = file.filename
-            ext = os.path.splitext(filename)[1].lower()
-
-            if ext == '.csv':
-                df = pd.read_csv(file, sep=';')
-            elif ext in ['.xlsx', '.xls']:
-                df = pd.read_excel(file)
-            else:
-                return "Formato de archivo no soportado", 400
-
-            columnas = df.columns.tolist()
-            tabla_html = df.to_html(classes='table table-striped', index=False)
-
-            # Guardar archivo temporal
-            df.to_csv(f'temp/archivo_temporal_voting_{ts}.csv', index=False)
-
-            return render_template(
-                'voting-classifier/mostrar-columnas.html',
-                columnas=columnas,
-                tabla=tabla_html
-            )
-
-    return render_template('voting-classifier/index.html')
-            
-@app.route('/predict-voting', methods=['GET', 'POST'])
-def predictVotingClassifier():
-    if request.method == 'POST':
-        file = request.files['file']
-        if not file:
-            return "No file", 400
-
-        # Guardar temporalmente (con extensión correcta)
-        ts = int(datetime.now().timestamp())
-        filename = f'temp/archivo_{ts}{os.path.splitext(file.filename)[1].lower()}'
-        file.save(filename)
-
-        # Cargar modelo y predecir
-        voting_model = VotingClassifierModel(filename)
-        model = voting_model.loadTrainedModel('models/voting_model_heart.joblib')
-
-        expected_columns = ['Edad', 'Presion_Arterial_Reposo', 'Colesterol']
-        df = voting_model.X.copy()
-        if not all(col in df.columns for col in expected_columns):
-            return f"Columnas incorrectas: se requieren {expected_columns}", 400
-
-        X_new = df[expected_columns]
-        predictions = model.predict(X_new)
-        df['Predicción Enfermedad Cardíaca'] = predictions
-
-        # Guardar resultados y renderizar
-        result_filename = f'resultados_{ts}.xlsx'
-        df.to_excel(os.path.join('temp', result_filename), index=False)
-        tabla = df.to_html(index=False)
-
-        return render_template(
-            'voting-classifier/resultados-prediccion.html',
-            tabla=tabla,
-            archivo=result_filename
-        )
-
-    return render_template('voting-classifier/cargar-nuevas-observaciones.html')
-
-@app.route('/descargar-resultados/<nombre_archivo>')
-def descargarResultados(nombre_archivo):
-    return send_from_directory('temp', nombre_archivo, as_attachment=True)
 
 if __name__ == "__main__":
     app.run(debug=True)
