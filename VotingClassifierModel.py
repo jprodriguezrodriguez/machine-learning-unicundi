@@ -5,22 +5,34 @@ from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import joblib
+import io
+import os
 
 class VotingClassifierModel:
     def __init__(self, filepath):
-        # Leer y preparar datos
-        df = pd.read_excel(filepath)
+        # Detectar extensión
+        ext = os.path.splitext(filepath)[1].lower()
+
+        # Leer datos según tipo de archivo
+        if ext == '.csv':
+            df = pd.read_csv(filepath)
+        elif ext in ['.xlsx', '.xls']:
+            df = pd.read_excel(filepath, engine='openpyxl')
+        else:
+            raise ValueError(f"Formato no soportado: {ext}")
+
+        # Seleccionar variables
         self.X = df[['Edad', 'Presion_Arterial_Reposo', 'Colesterol']]
         y = df['Diagnostico_Enfermedad_Cardiaca']
         self.y = (y > 0).astype(int)
 
-        # Variables para entrenamiento y prueba
+        # Inicializar atributos
         self.X_train = None
         self.X_test = None
         self.y_train = None
         self.y_test = None
         self.model = None
-    
+        
     def splitDataset(self, test_size=0.3):
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
             self.X, self.y, test_size=test_size, random_state=42, stratify=self.y

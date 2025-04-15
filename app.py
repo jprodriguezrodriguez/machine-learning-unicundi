@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from io import BytesIO
+import io
 import seaborn as sns
 from datetime import datetime
 import tempfile
@@ -335,6 +336,12 @@ def ejecutar_modelo():
 
 @app.route('/voting-classifier', methods=['GET', 'POST'])
 def loadFileVotingClassifier():
+    modelo = VotingClassifierModel('static/heart_disease_dataset_processed.xlsx')
+    modelo.splitDataset()
+    modelo.buildVotingModel()
+    modelo.trainModel()
+    modelo.evaluateModel()
+    modelo.saveModelJoblib('models/voting_model_heart.joblib')
     ts = int(datetime.now().timestamp())
     if request.method == 'POST':
         file = request.files['file']
@@ -365,44 +372,39 @@ def loadFileVotingClassifier():
             
 @app.route('/predict-voting', methods=['GET', 'POST'])
 def predictVotingClassifier():
-    ts = int(datetime.now().timestamp())
     if request.method == 'POST':
         file = request.files['file']
-        if file:
-            ext = os.path.splitext(file.filename)[1].lower()
-            if ext in ['.csv']:
-                df = pd.read_csv(file, sep=';')
-            elif ext in ['.xlsx', '.xls']:
-                df = pd.read_excel(file)
-            else:
-                return "Formato no válido", 400
-            
-            # -- Guardar archivo temporal
-            df.to_csv(f'temp/archivo_temporal_voting_{ts}.csv', index=False)
+        if not file:
+            return "No file", 400
 
-            voting_model = VotingClassifierModel(f'temp/archivo_temporal_voting_{ts}.csv')
-            model = voting_model.loadModelJoblib('models/voting_classifier_model.pkl')
+        # Guardar temporalmente (con extensión correcta)
+        ts = int(datetime.now().timestamp())
+        filename = f'temp/archivo_{ts}{os.path.splitext(file.filename)[1].lower()}'
+        file.save(filename)
 
-            expected_columns = ['Edad', 'Presion_Arterial_Reposo', 'Colesterol']
-            if not all(col in df.columns for col in expected_columns):
-                return f"Las columnas deben ser exactamente: {expected_columns}", 400
+        # Cargar modelo y predecir
+        voting_model = VotingClassifierModel(filename)
+        model = voting_model.loadTrainedModel('models/voting_model_heart.joblib')
 
-            X_new = df[expected_columns]
-            predictions = model.predict(X_new)
-            df['Predicción Enfermedad Cardíaca'] = predictions
+        expected_columns = ['Edad', 'Presion_Arterial_Reposo', 'Colesterol']
+        df = voting_model.X.copy()
+        if not all(col in df.columns for col in expected_columns):
+            return f"Columnas incorrectas: se requieren {expected_columns}", 400
 
-            ts = int(datetime.now().timestamp())
-            result_filename = f'resultados_prediccion_{ts}.xlsx'
-            result_path = os.path.join('temp', result_filename)
-            df.to_excel(result_path, index=False)
+        X_new = df[expected_columns]
+        predictions = model.predict(X_new)
+        df['Predicción Enfermedad Cardíaca'] = predictions
 
-            tabla_resultados = df.to_html(index=False)
+        # Guardar resultados y renderizar
+        result_filename = f'resultados_{ts}.xlsx'
+        df.to_excel(os.path.join('temp', result_filename), index=False)
+        tabla = df.to_html(index=False)
 
-            return render_template(
-                'voting-classifier/resultados-prediccion.html',
-                tabla=tabla_resultados,
-                archivo=result_filename
-            )
+        return render_template(
+            'voting-classifier/resultados-prediccion.html',
+            tabla=tabla,
+            archivo=result_filename
+        )
 
     return render_template('voting-classifier/cargar-nuevas-observaciones.html')
 

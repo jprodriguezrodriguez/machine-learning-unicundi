@@ -55,14 +55,6 @@
       <main class="container__content" id="main-content">
         <h2>Paso 2. ¿Deseas añadir información?</h2>
         <p>A continuación, puedes añadir información al dataset mostrado en pantalla.</p>
-        <form method="POST" action="/ejecutar_modelo">
-          <select name="target" id="target">
-            {% for col in columnas %}
-            <option value="{{ col }}">{{ col }}</option>
-            {% endfor %}
-          </select>
-          <button type="submit">Ejecutar modelo</button>
-        </form>
         <h2>Tabla de datos cargada</h2>
         <div class="table-card">
             {{ tabla|safe }}
