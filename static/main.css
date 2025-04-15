@@ -179,38 +179,6 @@ button:hover,
     flex-direction: column;
 }
 
-.table-card {
-    min-width: 78vw;
-    overflow-x: scroll;
-    max-height: 25vh;
-}
-
-.table-card table {
-    border-collapse: collapse;
-}
-
-.table-card table td,
-.table-card table th {
-    border: 1px solid #ddd;
-    padding: 8px;
-}
-
-.table-card table tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-.table-card table tr:hover {
-    background-color: #ddd;
-}
-
-.table-card table th {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    text-align: left;
-    background-color: #007bff;
-    color: white;
-}
-
 .card:hover {
     transform: scale(1.05);
 }
